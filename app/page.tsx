@@ -1,102 +1,76 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Activity, Bell, ChevronDown, ChevronRight, CircleHelp, Crown, Flame, Gift,
-  Gamepad2, Home, Menu, Search, ShieldCheck, Sparkles, Trophy, Wallet,
-  Zap, Radio, Star, UserRound, X
-} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Activity, Bell, ChevronRight, CircleHelp, Crown, Flame, Gamepad2, Gift, Home, Menu, Search, Settings, ShieldCheck, Sparkles, Trophy, UserRound, Wallet, X, RotateCcw, Dice5, Ticket, History, LogOut } from "lucide-react";
+import "./ada.css";
 
-const hotGames = [
-  { name: "Sweet Bonanza", studio: "Pragmatic Play", color: "pink", icon: "🍬", tag: "POPULAIRE" },
-  { name: "Gates of Olympus", studio: "Pragmatic Play", color: "gold", icon: "⚡", tag: "HOT" },
-  { name: "Sugar Rush", studio: "Pragmatic Play", color: "purple", icon: "🍭", tag: "NOUVEAU" },
-  { name: "Wanted Dead or a Wild", studio: "Hacksaw Gaming", color: "red", icon: "🤠", tag: "HOT" },
-  { name: "Aviator", studio: "Spribe", color: "blue", icon: "✈️", tag: "LIVE" }
+type Section = "Accueil" | "ADA Games" | "ADA Sports" | "ADA Wallet" | "ADA VIP" | "Mon compte" | "Administration";
+type Tx = { id:number; label:string; amount:number; date:string; kind:"credit"|"debit" };
+const initialBalance = 10000;
+const games = [
+  {name:"Neon Slots",kind:"Machines à sous",emoji:"🎰",desc:"Machine à sous démo · 3 rouleaux"},
+  {name:"Roulette ADA",kind:"Jeux de table",emoji:"🎡",desc:"Roulette européenne simulée"},
+  {name:"Blackjack 21",kind:"Jeux de table",emoji:"🂡",desc:"Défiez le croupier virtuel"},
+  {name:"Dice Rush",kind:"Jeux rapides",emoji:"🎲",desc:"Choisissez haut ou bas"},
 ];
-const categories = [
-  { label: "Machines à sous", icon: Gamepad2 },
-  { label: "Live Casino", icon: Radio },
-  { label: "Jeux originaux", icon: Sparkles },
-  { label: "Jeux de table", icon: Star },
-  { label: "Jeux rapides", icon: Zap },
-  { label: "Promotions", icon: Gift }
+const fixtures = [
+  {id:1,league:"LIGUE ADA · MATCH FICTIF",home:"FC ADA",away:"FC NOVA",time:"Aujourd'hui · 18:30",odds:[1.72,3.4,4.2]},
+  {id:2,league:"ADA BASKET · MATCH FICTIF",home:"Purple Comets",away:"Neon Wolves",time:"Aujourd'hui · 20:00",odds:[1.88,0,1.95]},
+  {id:3,league:"ADA ESPORTS · MATCH FICTIF",home:"Pixel Kings",away:"Cyber Foxes",time:"Demain · 16:00",odds:[2.1,3.1,1.8]},
 ];
-const nav = [
-  { label: "Accueil", icon: Home, active: true },
-  { label: "Événements", icon: Trophy },
-  { label: "Jeux chauds", icon: Flame },
-  { label: "Machines à sous", icon: Gamepad2 },
-  { label: "Jeux en direct", icon: Radio },
-  { label: "Club VIP", icon: Crown },
-  { label: "Bonus Hub", icon: Gift },
-  { label: "Mon profil", icon: UserRound }
-];
-
-export default function HomePage() {
-  const [balance, setBalance] = useState(10000);
-  const [activeTab, setActiveTab] = useState("Casino");
-  const [mobileMenu, setMobileMenu] = useState(false);
-  const [notice, setNotice] = useState("");
-  const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState("");
-
-  const demoAction = (message: string) => {
-    setNotice(message);
-    window.setTimeout(() => setNotice(""), 2600);
-  };
-
-  return (
-    <main className="app-shell">
-      <header className="topbar">
-        <button className="icon-button mobile-only" aria-label="Ouvrir le menu" onClick={() => setMobileMenu(!mobileMenu)}><Menu size={21}/></button>
-        <a className="brand" href="#"><span className="brand-mark">A</span><span className="brand-copy"><b>ADA</b><small>GAMES</small></span></a>
-        <div className="main-tabs">
-          {["Casino", "Sports"].map(tab => <button key={tab} className={activeTab === tab ? "tab active" : "tab"} onClick={() => { setActiveTab(tab); demoAction(tab === "Sports" ? "ADA Sports : aperçu des événements simulés" : "Bienvenue sur ADA Games"); }}>{tab === "Sports" ? <Trophy size={16}/> : <Gamepad2 size={16}/>} {tab}</button>)}
-        </div>
-        <div className="top-actions">
-          <div className="balance-pill"><span className="coin">A</span><b>{balance.toLocaleString("fr-BE", { minimumFractionDigits: 2 })}</b><small>ADA</small><ChevronDown size={15}/></div>
-          <button className="btn btn-green" onClick={() => demoAction("Les dépôts en argent réel ne sont pas disponibles sur cette démo.")}>Ajouter des crédits</button>
-          <button className="btn btn-outline" onClick={() => demoAction("Le portefeuille ADA est un portefeuille de démonstration.")}><Wallet size={16}/> Wallet</button>
-          <button className="icon-button" aria-label="Notifications" onClick={() => demoAction("Aucune nouvelle notification.")}><Bell size={19}/></button>
-          <div className="avatar">A</div>
-        </div>
-      </header>
-
-      <div className="layout">
-        <aside className={mobileMenu ? "sidebar open" : "sidebar"}>
-          <div className="side-heading">EXPLORER ADA <button className="icon-button mobile-only" onClick={() => setMobileMenu(false)} aria-label="Fermer"><X size={18}/></button></div>
-          {nav.map(({label, icon: Icon, active}) => <button key={label} className={active ? "nav-item selected" : "nav-item"} onClick={() => { setSelected(label); setMobileMenu(false); demoAction(label + " — section de démonstration"); }}><Icon size={18}/><span>{label}</span>{label === "Bonus Hub" && <em>NEW</em>}</button>)}
-          <div className="sidebar-promo"><div className="promo-orb">✦</div><b>ADA VIP CLUB</b><p>Progressez et découvrez les avantages de chaque niveau.</p><button onClick={() => demoAction("Le programme VIP sera activé dans une prochaine version.")}>Découvrir <ChevronRight size={14}/></button></div>
-          <div className="side-foot"><ShieldCheck size={15}/> Démo sécurisée · crédits fictifs</div>
-        </aside>
-
-        <section className="content">
-          <div className="ticker"><div className="ticker-icon"><Gift size={20}/></div><div><b>LE BONUS ADA EST À L’HONNEUR</b><span>Explorez les jeux et découvrez l'expérience ADA — sans argent réel.</span></div><button onClick={() => demoAction("Les promotions sont uniquement illustratives.")}>Découvrir <ChevronRight size={15}/></button><button className="ticker-close" aria-label="Fermer" onClick={e => e.currentTarget.parentElement?.classList.add("hidden")}><X size={17}/></button></div>
-
-          <div className="hero">
-            <div className="hero-copy"><div className="eyebrow"><Sparkles size={14}/> BIENVENUE DANS L’UNIVERS ADA</div><h1>Play your game.<br/><span>Own the moment.</span></h1><p>Le sport et le gaming réunis dans une expérience nouvelle génération.</p><div className="hero-buttons"><button className="btn btn-primary" onClick={() => setActiveTab("Casino")}>Explorer ADA <ChevronRight size={17}/></button><button className="btn btn-glass" onClick={() => {setActiveTab("Sports"); demoAction("Bienvenue dans ADA Sports.");}}>ADA Sports <Trophy size={16}/></button></div><div className="hero-dots"><i/><i/><i/></div></div>
-            <div className="hero-art"><div className="halo halo-one"/><div className="halo halo-two"/><div className="hero-crown">♛</div><div className="floating-chip chip-one">A</div><div className="floating-chip chip-two">✦</div><div className="floating-card">♠</div><div className="hero-orbit">ADA</div></div>
-          </div>
-
-          <div className="category-grid">{categories.map(({label, icon: Icon}) => <button key={label} className="category" onClick={() => {setSelected(label); demoAction(label + " : contenu de démonstration");}}><span><Icon size={21}/></span><b>{label}</b></button>)}</div>
-
-          {activeTab === "Sports" ? <section className="section"><div className="section-head"><div><span className="section-kicker">ADA SPORTS</span><h2>Événements à découvrir</h2></div><span className="demo-tag">SIMULATION</span></div><div className="sports-card"><div className="sports-league">⚽ LIGUE ADA · MATCH FICTIF</div><div className="match"><div><span className="team-badge">A</span><b>FC ADA</b></div><strong>VS</strong><div><span className="team-badge alt">N</span><b>FC NOVA</b></div></div><div className="odds">{["1 · 1.72","N · 3.40","2 · 4.20"].map(o => <button key={o} onClick={() => demoAction("Cote illustrative sélectionnée : " + o)}>{o}</button>)}</div><p>Match, équipes et cotes entièrement fictifs. Aucune mise réelle.</p></div></section> : <><section className="section"><div className="section-head"><div><span className="section-kicker">SÉLECTION ADA</span><h2><Flame size={21}/> Jeux chauds</h2></div><button className="text-link" onClick={() => demoAction("Catalogue complet bientôt disponible.")}>Voir tout <ChevronRight size={15}/></button></div><div className="game-grid">{hotGames.filter(g => g.name.toLowerCase().includes(search.toLowerCase())).map(game => <button key={game.name} className={"game-card " + game.color} onClick={() => demoAction(game.name + " est un aperçu visuel, le jeu n'est pas encore activé.")}><span className="game-tag">{game.tag}</span><span className="game-art">{game.icon}</span><b>{game.name}</b><small>{game.studio}</small></button>)}</div></section><section className="section"><div className="section-head"><div><span className="section-kicker">EN DIRECT</span><h2><Radio size={21}/> Live Casino</h2></div><span className="live-label"><i/> APERÇU</span></div><div className="live-grid">{[{n:"Roulette",e:"🎡"},{n:"Blackjack",e:"🂡"},{n:"Baccarat",e:"♠"},{n:"Crazy Time",e:"🎯"}].map(item => <button className="live-card" key={item.n} onClick={() => demoAction(item.n + " : table de démonstration bientôt disponible.")}><span>{item.e}</span><b>{item.n}</b><small>TABLE DE DÉMO</small></button>)}</div></section></>}
-
-          <div className="section search-section"><label htmlFor="game-search"><Search size={17}/></label><input id="game-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un jeu dans ADA…"/></div>
-          <footer>ADA © 2026 · Plateforme de démonstration · Aucun argent réel · <a href="#">Jeu responsable</a></footer>
-        </section>
-
-        <aside className="rightbar">
-          <div className="panel wallet-panel"><div className="panel-head"><span>VALEUR DU PORTEFEUILLE</span><Wallet size={17}/></div><div className="wallet-value">{balance.toLocaleString("fr-BE", {minimumFractionDigits:2})} <small>ADA</small></div><p>≈ {balance.toLocaleString("fr-BE")} crédits fictifs</p><div className="wallet-actions"><button onClick={() => setBalance(v => v + 1000)}>+ 1 000 crédits démo</button><button onClick={() => setBalance(10000)}>Réinitialiser</button></div></div>
-          <div className="panel vip-panel"><div className="panel-head"><span>VOTRE PROGRESSION VIP</span><Crown size={17}/></div><div className="vip-row"><div className="vip-gem">◆</div><div><b>Rookie I</b><small>Niveau de départ</small></div><strong>1.83%</strong></div><div className="progress"><i/></div><small className="muted">Progression illustrative</small></div>
-          <div className="panel event-panel"><div className="panel-head"><span><Activity size={16}/> ÉVÉNEMENT EN VEDETTE</span><span className="sim-tag">SIMULÉ</span></div><div className="event-league">Ligue ADA · Match fictif</div><div className="event-team"><span className="team-badge">A</span> FC ADA <b>1</b></div><div className="event-team"><span className="team-badge alt">N</span> FC NOVA <b>0</b></div><div className="event-time">58’ · Score fictif</div></div>
-          <div className="panel wins-panel"><div className="panel-head"><span><Trophy size={16}/> ACTIVITÉ RÉCENTE</span></div><div className="empty-state"><Sparkles size={23}/><b>Votre aventure commence ici</b><span>Les statistiques de démonstration apparaîtront ici.</span></div></div>
-          <div className="responsible"><ShieldCheck size={16}/><span>Crédits fictifs uniquement.<br/>Aucun dépôt ou retrait réel.</span></div>
-        </aside>
-      </div>
-      <nav className="mobile-nav"><button><Home/>Menu</button><button><Gamepad2/>Casino</button><button><Crown/>VIP</button><button><Trophy/>Sports</button><button><CircleHelp/>Plus</button></nav>
-      {notice && <div className="toast" role="status">{notice}</div>}
-    </main>
-  );
+export default function HomePage(){
+ const [section,setSection]=useState<Section>("Accueil");
+ const [balance,setBalance]=useState(initialBalance);
+ const [tx,setTx]=useState<Tx[]>([]);
+ const [slip,setSlip]=useState<{fixture:string;pick:string;odd:number;stake:number}[]>([]);
+ const [stake,setStake]=useState("100");
+ const [notice,setNotice]=useState("");
+ const [mobile,setMobile]=useState(false);
+ const [query,setQuery]=useState("");
+ const [profile,setProfile]=useState({name:"Joueur ADA",email:"joueur@ada.demo",nickname:"ADA Player"});
+ const [round,setRound]=useState("");
+ const [wager,setWager]=useState("100");
+ const [vipXp,setVipXp]=useState(183);
+ const [history,setHistory]=useState<string[]>([]);
+ const [admin,setAdmin]=useState(false);
+ const [showAll,setShowAll]=useState(false);
+ const [dark,setDark]=useState(true);
+ useEffect(()=>{try{const s=localStorage.getItem("ada-demo-state");if(s){const d=JSON.parse(s);setBalance(d.balance??initialBalance);setTx(d.tx??[]);setProfile(d.profile??profile);setVipXp(d.vipXp??183);setHistory(d.history??[]);}}catch{}},[]);
+ useEffect(()=>{try{localStorage.setItem("ada-demo-state",JSON.stringify({balance,tx,profile,vipXp,history}));}catch{}},[balance,tx,profile,vipXp,history]);
+ const toast=(s:string)=>{setNotice(s);window.setTimeout(()=>setNotice(""),2600)};
+ const record=(label:string,amount:number,kind:"credit"|"debit")=>{setBalance(v=>v+amount);setTx(v=>[{id:Date.now(),label,amount,date:new Date().toLocaleString("fr-BE"),kind},...v].slice(0,30));};
+ const navItems:[Section,any][]=[["Accueil",Home],["ADA Games",Gamepad2],["ADA Sports",Trophy],["ADA Wallet",Wallet],["ADA VIP",Crown],["Mon compte",UserRound],["Administration",Settings]];
+ const filtered=useMemo(()=>games.filter(g=>(g.name+" "+g.kind).toLowerCase().includes(query.toLowerCase())),[query]);
+ const play=(name:string)=>{
+  const amount=Math.max(10,Math.min(1000,Number(wager)||100));
+  if(balance<amount){toast("Solde démo insuffisant. Ajoutez des crédits fictifs.");return;}
+  record("Partie · "+name,-amount,"debit");
+  const win=Math.random()>.48;
+  const prize=win?Math.round(amount*(1.5+Math.random()*1.2)):0;
+  if(prize)record("Gain simulé · "+name,prize,"credit");
+  setVipXp(v=>v+Math.round(amount/10));
+  setRound(win?"GAGNÉ":"PERDU");
+  setHistory(v=>[new Date().toLocaleTimeString("fr-BE")+" · "+name+" · "+(win?"+"+prize:"-"+amount)+" ADA",...v].slice(0,8));
+ };
+ const addPick=(fixture:string,pick:string,odd:number)=>{setSlip(v=>[...v.filter(x=>x.fixture!==fixture),{fixture,pick,odd,stake:Math.max(10,Number(stake)||10)}]);toast("Sélection ajoutée au coupon virtuel.");};
+ const placeSlip=()=>{if(!slip.length){toast("Ajoutez d'abord une sélection.");return;}const total=slip.reduce((a,b)=>a+b.stake,0);if(total>balance){toast("Solde démo insuffisant.");return;}record("Coupon sportif virtuel · "+slip.length+" sélection(s)",-total,"debit");setHistory(v=>["Coupon simulé · "+slip.map(x=>x.pick).join(", "),...v].slice(0,8));setSlip([]);toast("Coupon virtuel enregistré. Aucun match réel n'est concerné.");};
+ const reset=()=>{setBalance(initialBalance);setTx([]);setSlip([]);setVipXp(183);setHistory([]);toast("Compte démo réinitialisé.");};
+ const level=vipXp>=5000?"Diamond":vipXp>=2500?"Platinum":vipXp>=1000?"Gold":"Rookie";
+ const pct=Math.min(100,(vipXp%1000)/10);
+ return <main className={dark?"ada-shell":"ada-shell light"}>
+ <header className="ada-top"><button className="ada-icon mobile" onClick={()=>setMobile(!mobile)}><Menu/></button><button className="ada-logo" onClick={()=>setSection("Accueil")}><span>A</span><b>ADA<small>GAMES</small></b></button><div className="ada-topnav"><button className={section==="ADA Games"?"on":""} onClick={()=>setSection("ADA Games")}><Gamepad2/> Games</button><button className={section==="ADA Sports"?"on":""} onClick={()=>setSection("ADA Sports")}><Trophy/> Sports</button></div><div className="ada-topright"><div className="ada-balance"><i>A</i><b>{balance.toLocaleString("fr-BE")} ADA</b></div><button className="ada-add" onClick={()=>record("Recharge démo quotidienne",1000,"credit")}>+ 1 000 crédits</button><button className="ada-icon" onClick={()=>toast("Aucune notification.")}><Bell/></button><button className="ada-avatar" onClick={()=>setSection("Mon compte")}>A</button></div></header>
+ <div className="ada-layout"><aside className={"ada-sidebar "+(mobile?"opened":"")}><div className="ada-label">ESPACE ADA</div>{navItems.map(([n,I])=><button key={n} className={section===n?"active":""} onClick={()=>{setSection(n);setMobile(false)}}><I size={18}/>{n}{n==="Administration"&&<span className="ada-beta">BETA</span>}</button>)}<div className="ada-sidebox"><Crown/><b>ADA VIP CLUB</b><p>Progressez à chaque partie de démonstration.</p><button onClick={()=>setSection("ADA VIP")}>Voir les avantages <ChevronRight/></button></div><small className="ada-safe"><ShieldCheck/> Démo uniquement · aucun argent réel</small></aside>
+ <section className="ada-main">
+ {section==="Accueil"&&<><div className="ada-banner"><div><span className="ada-eyebrow"><Sparkles/> L'EXPÉRIENCE ADA</span><h1>Play your game.<br/><em>Own the moment.</em></h1><p>Sport, gaming et compétition dans un univers nouvelle génération.</p><div className="ada-actions"><button onClick={()=>setSection("ADA Games")}>Explorer les jeux <ChevronRight/></button><button className="ghost" onClick={()=>setSection("ADA Sports")}>Découvrir ADA Sports <Trophy/></button></div></div><div className="ada-banner-art">♛<span>ADA</span></div></div><div className="ada-quick">{[["🎰","Jeux démo","ADA Games"],["⚽","Sports simulés","ADA Sports"],["💎","Club VIP","ADA VIP"],["👤","Mon compte","Mon compte"]].map(([e,t,s])=><button key={t} onClick={()=>setSection(s as Section)}><i>{e}</i><b>{t}</b><ChevronRight/></button>)}</div><div className="ada-sectionhead"><div><small>SÉLECTION ADA</small><h2>À découvrir</h2></div><button onClick={()=>setSection("ADA Games")}>Tous les jeux <ChevronRight/></button></div><div className="ada-gamegrid">{games.slice(0,3).map(g=><button className="ada-game" key={g.name} onClick={()=>setSection("ADA Games")}><span>{g.emoji}</span><b>{g.name}</b><small>{g.desc}</small></button>)}</div><div className="ada-sectionhead"><div><small>SPORTS VIRTUELS</small><h2>Événements en vedette</h2></div><button onClick={()=>setSection("ADA Sports")}>Voir le calendrier <ChevronRight/></button></div><div className="ada-fixture compact">{fixtures[0].league}<div><b>FC ADA</b><strong>VS</strong><b>FC NOVA</b></div><small>Match fictif · cotes illustratives</small></div></>}
+ {section==="ADA Games"&&<><div className="ada-pagehead"><div><small>ARCADE & CASINO DÉMO</small><h1>ADA Games</h1><p>Des mini-jeux interactifs avec des crédits entièrement fictifs.</p></div><span className="ada-sim">MODE SIMULATION</span></div><div className="ada-game-controls"><label><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Rechercher un jeu..."/></label><label>Mise démo <input type="number" min="10" max="1000" value={wager} onChange={e=>setWager(e.target.value)}/> ADA</label></div><div className="ada-gamegrid large">{filtered.map(g=><article className="ada-game playable" key={g.name}><span>{g.emoji}</span><b>{g.name}</b><small>{g.desc}</small><button onClick={()=>play(g.name)}>Jouer en démo <ChevronRight/></button></article>)}</div><div className="ada-result">{round&&<><b>RÉSULTAT DE LA DERNIÈRE PARTIE : {round}</b><p>Résultat aléatoire de démonstration, sans valeur monétaire.</p></>}<h3><History/> Dernières parties</h3>{history.length?history.map((h,i)=><p key={i}>{h}</p>):<p>Aucune partie jouée pour le moment.</p>}</div></>}
+ {section==="ADA Sports"&&<><div className="ada-pagehead"><div><small>COMPÉTITION VIRTUELLE</small><h1>ADA Sports</h1><p>Explorez des rencontres inventées et testez un coupon sans enjeu réel.</p></div><span className="ada-sim">MATCHS FICTIFS</span></div><div className="ada-sports-layout"><div>{fixtures.map(f=><article className="ada-fixture" key={f.id}><small>{f.league}</small><div className="ada-fixture-meta">{f.time}<span>SIMULÉ</span></div><div className="ada-teams"><b>{f.home}</b><strong>VS</strong><b>{f.away}</b></div><div className="ada-odds">{["1","N","2"].map((p,i)=>f.odds[i]>0&&<button key={p} onClick={()=>addPick(f.home+" – "+f.away,p,f.odds[i])}><small>{p}</small><b>{f.odds[i].toFixed(2)}</b></button>)}</div></article>)}</div><aside className="ada-slip"><h3><Ticket/> Coupon virtuel</h3>{slip.length?slip.map(s=><p key={s.fixture}>{s.fixture}<b>{s.pick} · {s.odd.toFixed(2)}</b></p>):<p>Choisissez une issue sur un match fictif pour remplir votre coupon.</p>}<label>Mise fictive par sélection<input type="number" min="10" value={stake} onChange={e=>setStake(e.target.value)}/></label><b>Cote combinée : {slip.reduce((a,b)=>a*b.odd,1).toFixed(2)}</b><button disabled={!slip.length} onClick={placeSlip}>Valider le coupon démo</button></aside></div></>}
+ {section==="ADA Wallet"&&<><div className="ada-pagehead"><div><small>GESTION DES CRÉDITS FICTIFS</small><h1>ADA Wallet</h1><p>Votre portefeuille de démonstration et son historique.</p></div><span className="ada-sim">AUCUNE VALEUR RÉELLE</span></div><div className="ada-wallet-hero"><small>SOLDE DISPONIBLE</small><h2>{balance.toLocaleString("fr-BE")} <i>ADA</i></h2><p>Crédits virtuels destinés aux fonctionnalités de démonstration.</p><button onClick={()=>record("Bonus démo",1000,"credit")}>Recevoir 1 000 crédits fictifs</button><button className="subtle" onClick={reset}><RotateCcw/> Réinitialiser la démo</button></div><div className="ada-sectionhead"><div><small>JOURNAL DU COMPTE</small><h2>Historique des transactions</h2></div></div><div className="ada-table">{tx.length?tx.map(t=><div key={t.id}><span>{t.label}<small>{t.date}</small></span><b className={t.amount>0?"positive":"negative"}>{t.amount>0?"+":""}{t.amount.toLocaleString("fr-BE")} ADA</b></div>):<p>Aucune transaction pour le moment.</p>}</div></>}
+ {section==="ADA VIP"&&<><div className="ada-pagehead"><div><small>RÉCOMPENSES DE DÉMONSTRATION</small><h1>ADA VIP Club</h1><p>Un programme de progression fictif pour découvrir les niveaux ADA.</p></div><Crown className="ada-bigcrown"/></div><div className="ada-viphero"><div><small>NIVEAU ACTUEL</small><h2>{level}</h2><p>{vipXp.toLocaleString("fr-BE")} points d'expérience démo</p></div><div className="ada-vipdiamond">✦</div><div className="ada-vipprogress"><span>Progression vers le prochain niveau</span><b>{pct.toFixed(0)}%</b><i><em style={{width:pct+"%"}}/></i></div></div><div className="ada-viplevels">{[["Rookie","🌱","Bienvenue dans ADA"],["Gold","🥇","Avantages de niveau"],["Platinum","💠","Expérience premium"],["Diamond","💎","Statut ultime"]].map(([n,e,d],i)=><article key={n}><span>{e}</span><h3>{n}</h3><p>{d}</p><small>{[0,1000,2500,5000][i].toLocaleString("fr-BE")} XP</small></article>)}</div><p className="ada-disclaimer">Les points, niveaux et récompenses sont simulés et n'ont aucune valeur échangeable.</p></>}
+ {section==="Mon compte"&&<><div className="ada-pagehead"><div><small>ESPACE PERSONNEL</small><h1>Mon compte</h1><p>Gérez les informations locales de votre profil démo.</p></div><UserRound className="ada-bigcrown"/></div><div className="ada-profile"><div className="ada-profile-avatar">A</div><div><h2>{profile.name}</h2><p>{profile.email}</p><span>Compte de démonstration</span></div></div><div className="ada-form"><label>Nom affiché<input value={profile.name} onChange={e=>setProfile({...profile,name:e.target.value})}/></label><label>Adresse e-mail démo<input value={profile.email} onChange={e=>setProfile({...profile,email:e.target.value})}/></label><label>Pseudo<input value={profile.nickname} onChange={e=>setProfile({...profile,nickname:e.target.value})}/></label><button onClick={()=>toast("Profil démo enregistré sur cet appareil.")}>Enregistrer le profil</button></div><div className="ada-settings"><h3><Settings/> Préférences</h3><button onClick={()=>setDark(v=>!v)}>Apparence : {dark?"Sombre":"Clair"}</button><button onClick={reset}><LogOut/> Réinitialiser les données locales</button></div></>}
+ {section==="Administration"&&<><div className="ada-pagehead"><div><small>CONSOLE LOCALE</small><h1>Administration démo</h1><p>Vue de contrôle locale, sans gestion de vrais utilisateurs.</p></div><ShieldCheck className="ada-bigcrown"/></div><div className="ada-admin-grid"><article><small>CRÉDITS EN CIRCULATION (LOCAL)</small><b>{balance.toLocaleString("fr-BE")} ADA</b></article><article><small>TRANSACTIONS</small><b>{tx.length}</b></article><article><small>XP VIP</small><b>{vipXp}</b></article><article><small>ACTIVITÉ RÉCENTE</small><b>{history.length}</b></article></div><div className="ada-wallet-hero"><h3>Outils de démonstration</h3><p>Les actions ci-dessous ne touchent qu'aux données enregistrées dans ce navigateur.</p><button onClick={()=>record("Crédits de test administrateur",5000,"credit")}>Ajouter 5 000 crédits de test</button><button className="subtle" onClick={reset}><RotateCcw/> Réinitialiser toutes les données locales</button></div></>}
+ <footer className="ada-footer">ADA © 2026 · Démonstration interactive · Crédits fictifs uniquement · Aucun dépôt, retrait ou pari réel.</footer>
+ </section>
+ <aside className="ada-right"><article className="ada-miniwallet"><small>PORTEFEUILLE DÉMO</small><h2>{balance.toLocaleString("fr-BE")} <i>ADA</i></h2><p>Crédits fictifs</p><button onClick={()=>setSection("ADA Wallet")}>Ouvrir ADA Wallet <ChevronRight/></button></article><article className="ada-minivip"><small><Crown/> CLUB VIP</small><h3>{level}</h3><div><i style={{width:pct+"%"}}/></div><p>{vipXp} XP · progression démo</p><button onClick={()=>setSection("ADA VIP")}>Voir le programme</button></article><article className="ada-mini-activity"><small><Activity/> ACTIVITÉ RÉCENTE</small>{history.slice(0,3).map((h,i)=><p key={i}>{h}</p>)}{!history.length&&<p>Votre activité apparaîtra ici.</p>}</article><div className="ada-responsible"><ShieldCheck/> Tous les crédits, matchs et résultats sont fictifs.</div></aside></div>
+ <nav className="ada-mobilebar">{navItems.slice(0,5).map(([n,I])=><button key={n} onClick={()=>setSection(n)}><I/>{n.replace("ADA ","")}</button>)}</nav>{notice&&<div className="ada-toast">{notice}</div>}
+ </main>
 }
